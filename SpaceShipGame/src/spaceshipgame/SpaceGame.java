@@ -4,6 +4,8 @@
  */
 package spaceshipgame;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.image.Image;
 import java.util.Random;
 import javafx.application.Application;
@@ -45,7 +47,7 @@ public class SpaceGame extends Application{
     Spaceship player;
     List<Bullet> bullets;
     List<Universe> univ;
-    List<Enemy>enemies;
+    List<Enemy> enemies;
     
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -56,7 +58,7 @@ public class SpaceGame extends Application{
         univ=new ArrayList<>();
         bullets=new ArrayList<>();
         enemies=new ArrayList<>();
-        play= new ArrayList<>();
+         
     }
     
     public class Spaceship {
@@ -184,5 +186,12 @@ public class SpaceGame extends Application{
         }
     }
         
+    Enemy newEnemy(){
+        return new Enemy(50+RAND.nextInt(WIDTH-100),0,PLAYER_SIZE, ENEMIES_IMG[RAND.nextInt(ENEMIES_IMG.length)]); 
+    }
+    
+    int distance(int x1, int y1, int x2, int y2) { 
+        return (int) Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2));     
+    }
     
 }
