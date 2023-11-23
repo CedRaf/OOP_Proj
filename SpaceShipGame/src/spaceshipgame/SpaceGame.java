@@ -55,11 +55,11 @@ public class SpaceGame extends Application{
     }
     
     public void setup(){
-        univ=new ArrayList<>();
-        bullets=new ArrayList<>();
-        enemies=new ArrayList<>();
-        player= new Spaceship(WIDTH /2, HEIGHT  - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
-        score=0;
+        univ = new ArrayList<>();
+        bullets = new ArrayList<>();
+        enemies = new ArrayList<>();
+        player = new Spaceship(WIDTH /2, HEIGHT  - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
+        score = 0;
          
     }
     
