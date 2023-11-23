@@ -8,6 +8,3 @@ package spaceshipgame;
  *
  * @author rhenz
  */
-public class Enemy {
-    
-}
