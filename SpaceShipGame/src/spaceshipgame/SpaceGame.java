@@ -6,20 +6,29 @@ package spaceshipgame;
 
 import java.util.ArrayList;
 import java.util.List;
-import javafx.scene.image.Image;
 import java.util.Random;
+import java.util.stream.IntStream;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  *
- * @author Cedric
+ * @author Cedric, TJ, Rhenz , Budz
  */
 public class SpaceGame extends Application{
 
-    
     //variables
     public static final Random RAND = new Random(); 
     public static final int WIDTH = 800;
@@ -49,19 +58,103 @@ public class SpaceGame extends Application{
     List<Universe> univ;
     List<Enemy> enemies;
     
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    private double mouseX;
+    private int score; 
     
+    @Override 
+    public void start(Stage stage) throws Exception{
+        Canvas canvas = new Canvas(WIDTH, HEIGHT);
+        gc = canvas.getGraphicsContext2D();
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), e -> run(gc)));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+        canvas.setCursor(Cursor.MOVE); 
+        canvas.setOnMouseMoved(e -> mouseX = e.getX());
+	canvas.setOnMouseClicked(e -> {
+            if(bullets.size() < MAX_SHOTS) bullets.add(player.shoot());
+            if(gameOver) { 
+		gameOver = false;
+		setup();
+			}
+		});
+	setup();
+	stage.setScene(new Scene(new StackPane(canvas)));
+	stage.setTitle("Spaceship Pew Pew");
+	stage.show();
+        
+    }
+   
     public void setup(){
         univ = new ArrayList<>();
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
         player = new Spaceship(WIDTH /2, HEIGHT  - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
         score = 0;
+        IntStream.range(0, MAX_ENEMIES).mapToObj(i->this.newEnemy()).forEach(enemies::add);
          
     }
+    
+    private void run(GraphicsContext gc){
+        gc.setFill(Color.grayRgb(20));
+        gc.fillRect(0, 0, WIDTH, HEIGHT);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFont(Font.font(20));
+        gc.setFill(Color.WHITE);
+        gc.fillText("Score: " + score, 60, 20);
+        
+        if(gameOver){
+            gc.setFont(Font.font(35));
+            gc.setFill(Color.YELLOW);
+            gc.fillText("BANGAA NIMO OI\n SCORE NIMO KAY: " + score + "\n Click to play again", WIDTH/2, HEIGHT/2.5);
+        }
+        univ.forEach(Universe::draw);
+        player.update();
+        player.draw();
+        player.posX = (int) mouseX; 
+        
+        enemies.stream().peek(Spaceship::update).peek(Spaceship::draw).forEach(e->{
+            if(player.hit(e) && !player.exploding){
+                player.explode();
+            }
+        });
+        
+        
+        for(int i = bullets.size()-1;i>=0;i++){
+            Bullet bullet = bullets.get(i);
+            if(bullet.posY < 0 || bullet.toRemove){
+                bullets.remove(i);
+                continue;
+            }
+            bullet.update();
+            bullet.draw();
+            for(Enemy en : enemies){
+                if(bullet.hit(en) && !en.exploding){
+                    score++;
+                    en.explode();
+                    bullet.toRemove = true;
+                }
+            }   
+        }
+        
+        for(int i=enemies.size()-1;i>=0;i--){
+            if(enemies.get(i).destroyed){
+                enemies.set(i,newEnemy()); 
+            }
+        }
+        
+        gameOver = player.destroyed;
+        if(RAND.nextInt(10)>2){
+            univ.add(new Universe());
+        }
+        
+        for(int i=0;i<univ.size();i++){
+            if(univ.get(i).posY > HEIGHT)
+                univ.remove(i);
+        }
+        
+        
+    }
+    
     
     public class Spaceship {
     
@@ -151,7 +244,7 @@ public class SpaceGame extends Application{
             }
         }
             
-        public boolean colide(Spaceship Spaceship) {
+        public boolean hit(Spaceship Spaceship) {
                 int distance = distance(this.posX +size /2, this.posY +size/2,
                 Spaceship.posX +Spaceship.size /2, Spaceship.posY+Spaceship.size/2);
                 return distance < Spaceship.size /2 +size/2;
@@ -194,6 +287,13 @@ public class SpaceGame extends Application{
     
     int distance(int x1, int y1, int x2, int y2) { 
         return (int) Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2));     
+    }
+    
+    
+    
+    
+    public static void main(String[] args) {
+        launch(args);
     }
     
 }
