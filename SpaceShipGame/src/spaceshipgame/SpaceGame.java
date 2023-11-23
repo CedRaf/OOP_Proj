@@ -58,6 +58,8 @@ public class SpaceGame extends Application{
         univ=new ArrayList<>();
         bullets=new ArrayList<>();
         enemies=new ArrayList<>();
+        player= new Spaceship(WIDTH /2, HEIGHT  - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
+        score=0;
          
     }
     
