@@ -143,10 +143,11 @@ public class SpaceGame extends Application{
             }   
         }
     
-       public class Universe{
-            int posX, posY;
-            private int h,w,r,g,b;
-            private double opacity;
+    public class Universe{
+        
+        int posX, posY;
+        private int h,w,r,g,b;
+        private double opacity;
             
         public Universe(){
             posX=RAND.nextInt(WIDTH);
@@ -159,7 +160,7 @@ public class SpaceGame extends Application{
             opacity = RAND.nextFloat();
             
             if(opacity <0)opacity *=-1;
-            if(opacity >0.5) opacity=0.5;
+            if(opacity >0.5) opacity = 0.5;
         }   
         
         public void draw(){
@@ -170,8 +171,7 @@ public class SpaceGame extends Application{
             posY+=20;
          
         }
-        }
+    }
         
     
-
 }
