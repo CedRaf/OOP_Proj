@@ -42,10 +42,21 @@ public class SpaceGame extends Application{
     boolean gameOver = false;
     private GraphicsContext gc; 
     
+    Spaceship player;
+    List<Bullet> bullets;
+    List<Universe> univ;
+    List<Enemy>enemies;
     
     @Override
     public void start(Stage primaryStage) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    public void setup(){
+        univ=new ArrayList<>();
+        bullets=new ArrayList<>();
+        enemies=new ArrayList<>();
+        play= new ArrayList<>();
     }
     
     public class Spaceship {
