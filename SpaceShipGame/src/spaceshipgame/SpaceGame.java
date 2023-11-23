@@ -36,7 +36,7 @@ public class SpaceGame extends Application{
     public static final int PLAYER_SIZE = 60; 
     
     static final Image PLAYER_IMG = new Image("file:/images/player.png"); 
-    static final Image EXPLOSION_IMG = new Image("file:/.images/explosion.png") {};
+    static final Image EXPLOSION_IMG = new Image("file:/images/explosion.png") {};
     
     static final int EXPLOSION_W = 128;
     static final int EXPLOSION_ROWS = 3;
