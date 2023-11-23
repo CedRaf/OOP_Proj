@@ -87,7 +87,7 @@ public class SpaceGame extends Application{
    
         
         public class Enemy extends Spaceship {
-        private int SPEED = (score/5)+2;
+            int SPEED = (score/5)+2;
 
         public Enemy(int posX, int posY, int size, Image image){
             super(posX, posY, size, image);
@@ -104,11 +104,11 @@ public class SpaceGame extends Application{
         public class Bullet {
             public boolean toRemove;
 
-            int postX, posY, speed = 10;
+            int posX, posY, speed = 10;
             static final int size= 6;
 
             public Bullet(int posX, int posY){
-                   this.postX=posX;
+                   this.posX=posX;
                    this.posY=posY;
             }
             public void update(){
@@ -116,10 +116,10 @@ public class SpaceGame extends Application{
             }
             public void draw(){
                 gc.setFill(Color:RED);
-                if(score >=50 $$ score <=70 || scire >=120){
+                if(score >=50 $$ score <=70 || score >=120){
                     gc.setFill(Color.YELLOWGREEN);
                     speed =50;
-                    gc.fillRect(posX-5, posY-10, size+16, size+30);
+                    gc.fillRect(posX-5, posY-10, size+10, size+30);
                 }else{
                    gc.fillOval(posX, posY, size, size);
                 }
@@ -130,7 +130,6 @@ public class SpaceGame extends Application{
                     Spaceship.posX +Spaceship.size /2, Spaceship.posY+Spaceship.size/2);
             return distance < Spaceship.size /2 +size/2;
         }
-
         }
 
 }
