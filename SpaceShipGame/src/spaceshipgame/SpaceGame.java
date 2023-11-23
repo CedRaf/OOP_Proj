@@ -35,8 +35,8 @@ public class SpaceGame extends Application{
     public static final int HEIGHT = 600;
     public static final int PLAYER_SIZE = 60; 
     
-    static final Image PLAYER_IMG = new Image("file:.../images/player.png"); 
-    static final Image EXPLOSION_IMG = new Image("file:.../images/explosion.png");
+    static final Image PLAYER_IMG = new Image("file:../images/player.png"); 
+    static final Image EXPLOSION_IMG = new Image("file:../images/explosion.png");
     
     static final int EXPLOSION_W = 128;
     static final int EXPLOSION_ROWS = 3;
@@ -45,8 +45,8 @@ public class SpaceGame extends Application{
     static final int EXPLOSION_STEPS = 15;
     
     static final Image ENEMIES_IMG[] = {
-        new Image("file:images/shooter_enemy.png"),
-        new Image("file:images/regular_enemy.png")   
+        new Image("file:../images/shooter_enemy.png"),
+        new Image("file:../images/regular_enemy.png")   
     };
     
     final int MAX_ENEMIES = 10, MAX_SHOTS = MAX_ENEMIES*2;
@@ -105,7 +105,7 @@ public class SpaceGame extends Application{
         if(gameOver){
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
-            gc.fillText("BANGAA NIMO OI\n SCORE NIMO KAY: " + score + "\n Click to play again", WIDTH/2, HEIGHT/2.5);
+            gc.fillText("BANGAA NIMO OI\n YOUR SCORE: " + score + "\n Click to play again", WIDTH/2, HEIGHT/2.5);
         }
         univ.forEach(Universe::draw);
         player.update();
@@ -293,7 +293,7 @@ public class SpaceGame extends Application{
     
     
     public static void main(String[] args) {
-        launch(args);
+        launch(args); 
     }
     
 }
