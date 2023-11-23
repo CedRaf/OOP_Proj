@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import java.util.Random;
 import javafx.application.Application;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -49,12 +50,12 @@ public class SpaceGame extends Application{
     
     public class Spaceship {
     
-    private int posX, posY, size;
-        private boolean exploding, destroyed;
-        private Image img;
-        private int explosionStep = 0;
+        int posX, posY, size;
+        boolean exploding, destroyed;
+        Image img;
+        int explosionStep = 0;
 
-        public Spaceship(int posX, int posY, int size, boolean exploding, boolean destroyed, Image img) {
+        public Spaceship(int posX, int posY, int size, Image img) {
             this.posX = posX;
             this.posY = posY;
             this.size = size;
@@ -62,7 +63,7 @@ public class SpaceGame extends Application{
         }
         
         public Bullet shoot(){
-            return new Bullet(posX+size/2 - Shot.size/2, posY - Shot.size); 
+            return new Bullet(posX+size/2 - Bullet.size/2, posY - Bullet.size); 
         }
         
         public void update() {
@@ -82,54 +83,68 @@ public class SpaceGame extends Application{
             int d = distance(this.posX+size/2, this.posY+size/2, other.posX + other.size/2, other.posY + other.size /2); 
             return d < other.size /2 + this.size; 
         }
+        
+        public void explode(){
+            exploding = true;
+            explosionStep = -1; 
+        }
     
-}
+    }
    
         
-        public class Enemy extends Spaceship {
+    public class Enemy extends Spaceship{
             int SPEED = (score/5)+2;
 
         public Enemy(int posX, int posY, int size, Image image){
             super(posX, posY, size, image);
         }
+        
+        @Override
         public void update(){
             super.update();
             if(!exploding &&  !destroyed) posY +=SPEED;
             if(posY > HEIGHT) destroyed = true;
         } 
 
-        }
+    }
         
 
-        public class Bullet {
-            public boolean toRemove;
+    public class Bullet {
+        
+        public boolean toRemove;
 
-            int posX, posY, speed = 10;
-            static final int size= 6;
+        int posX, posY, speed = 10;
+        static final int size = 6;
 
-            public Bullet(int posX, int posY){
-                   this.posX=posX;
-                   this.posY=posY;
+        public Bullet(int posX, int posY){
+            this.posX=posX;
+            this.posY=posY;
+        }
+        
+        public void update(){
+            posY-=speed;
+        }
+       
+        public void draw(){
+            gc.setFill(Color.RED);
+            if(score >=50 && score <=70 || score >=120){
+                gc.setFill(Color.YELLOWGREEN);
+                speed =50;
+                gc.fillRect(posX-5, posY-10, size+10, size+30);
+            }else{
+                gc.fillOval(posX, posY, size, size);
             }
-            public void update(){
-                posY-=speed;
-            }
-            public void draw(){
-                gc.setFill(Color:RED);
-                if(score >=50 $$ score <=70 || score >=120){
-                    gc.setFill(Color.YELLOWGREEN);
-                    speed =50;
-                    gc.fillRect(posX-5, posY-10, size+10, size+30);
-                }else{
-                   gc.fillOval(posX, posY, size, size);
-                }
-            }
+        }
             
         public boolean colide(Spaceship Spaceship) {
-            int distance = distance(this.posX +size /2, this.posY +size/2,
-                    Spaceship.posX +Spaceship.size /2, Spaceship.posY+Spaceship.size/2);
-            return distance < Spaceship.size /2 +size/2;
+                int distance = distance(this.posX +size /2, this.posY +size/2,
+                Spaceship.posX +Spaceship.size /2, Spaceship.posY+Spaceship.size/2);
+                return distance < Spaceship.size /2 +size/2;
+            }   
         }
-        }
+    
+    
+    
+    
 
 }
