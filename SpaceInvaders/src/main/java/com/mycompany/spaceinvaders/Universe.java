@@ -22,7 +22,7 @@ public class Universe {
   
     public Universe() {
         posX = App.RAND.nextInt(App.WIDTH);
-        posY = 0;
+        posY = App.RAND.nextInt(App.HEIGHT);
         w = App.RAND.nextInt(5) + 1;
         h = App.RAND.nextInt(5) + 1;
         r = App.RAND.nextInt(100) + 150;

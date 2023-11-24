@@ -24,8 +24,8 @@ public class App extends Application {
 
     //variables
     public static final Random RAND = new Random();
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 1280;
+    public static final int HEIGHT = 720;
     public static final int PLAYER_SIZE = 60;
 
     static final Image PLAYER_IMG = new Image("file:./images/player.png");
@@ -107,7 +107,9 @@ public class App extends Application {
                     HEIGHT / 2.5);
         }
           univ.forEach(u -> u.draw(gc)); 
-
+//            for(Universe u : univ) {
+//                u.draw(gc);
+//             }
         player.update();
         player.draw(gc);
         player.posX = (int) mouseX;

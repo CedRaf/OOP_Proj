@@ -24,3 +24,4 @@ public class Enemy extends Spaceship {
             destroyed = true;
     }
 }
+
