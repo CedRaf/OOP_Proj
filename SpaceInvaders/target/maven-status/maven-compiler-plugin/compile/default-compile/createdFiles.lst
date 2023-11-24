@@ -1,0 +1,9 @@
+com\mycompany\spaceinvaders\Enemy.class
+com\mycompany\spaceinvaders\SystemInfo.class
+com\mycompany\spaceinvaders\ShooterEnemy.class
+com\mycompany\spaceinvaders\Spaceship.class
+module-info.class
+com\mycompany\spaceinvaders\App.class
+com\mycompany\spaceinvaders\Bullet.class
+com\mycompany\spaceinvaders\App$1.class
+com\mycompany\spaceinvaders\Universe.class
