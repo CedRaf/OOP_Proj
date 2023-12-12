@@ -13,15 +13,37 @@ import javafx.scene.image.Image;
 
 public class ShooterEnemy extends Enemy {
 
+    private boolean canShoot = true;
+    private long lastShotTime;
+
     public ShooterEnemy(int posX, int posY, int size, Image image) {
         super(posX, posY, size, image);
     }
 
     @Override
-    
-    public Bullet shoot() {
-        // Adjust the starting position of the bullet based on the enemy's position
-        return new Bullet(posX + size / 2 - Bullet.size / 2, posY + size);
+    public void update() {
+        super.update();
+        checkShootCooldown();
     }
-    
+
+    private void checkShootCooldown() {
+        long currentTime = System.currentTimeMillis();
+        if (!canShoot && currentTime - lastShotTime >= getShootCooldown()) {
+            canShoot = true;
+        }
+    }
+
+    private long getShootCooldown() {
+        return 2000; 
+    }
+
+    @Override
+    public Bullet shoot() {
+        if (canShoot) {
+            lastShotTime = System.currentTimeMillis();
+            canShoot = false;
+            return new Bullet(posX + size / 2 - Bullet.size / 2, posY + size);
+        }
+        return null; 
+    }
 }

@@ -22,7 +22,7 @@ import javafx.util.Duration;
 
 public class App extends Application {
 
-    //variables
+    //VARIABLES
     public static final Random RAND = new Random();
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
@@ -48,11 +48,14 @@ public class App extends Application {
 
     Spaceship player;
     List<Bullet> bullets;
+    List<Bullet> shooterBullets;
     List<Universe> univ;
     List<Enemy> enemies;
+    List<ShooterEnemy> shooterEnemies;
 
     private double mouseX;
     static int score;
+    static int gold; 
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -80,13 +83,17 @@ public class App extends Application {
 
     public void setup() {
         univ = new ArrayList<>();
+        shooterBullets = new ArrayList<>(); 
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
+        shooterEnemies = new ArrayList<>();
         player = new Spaceship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
         score = 0;
-        IntStream.range(0, MAX_ENEMIES).mapToObj(i -> newEnemy()).forEach(enemies::add);
+        IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newShooterEnemy()).forEach(shooterEnemies::add);
+        IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newEnemy()).forEach(enemies::add);
+        
+}
 
-    }
 
     private void run(javafx.scene.canvas.GraphicsContext gc) {
         gc.setFill(Color.grayRgb(20));
@@ -95,30 +102,64 @@ public class App extends Application {
         gc.setFont(Font.font(20));
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + score, 60, 20);
+        gc.fillText("Gold: " + gold, 60, 40); 
 
+        //GAME LOGIC
         if (gameOver && score < 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
-            gc.fillText("BANGAA NIMO OI\n SCORE NIMO KAY: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
+            gc.fillText("Game Over! Your score is: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
         } else if (gameOver && score > 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
-            gc.fillText("MAAYOHA NIMO OI\n SCORE NIMO KAY: " + score + "\n Click to play again", WIDTH / 2,
-                    HEIGHT / 2.5);
+            gc.fillText("HAHAHA UR SHIT: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
         }
-          univ.forEach(u -> u.draw(gc)); 
-//            for(Universe u : univ) {
-//                u.draw(gc);
-//             }
+        
+        
+        univ.forEach(u -> u.draw(gc)); 
         player.update();
         player.draw(gc);
         player.posX = (int) mouseX;
-
+        
+        
+        //ENEMY SPAWNING, SHOOTING, ETC.
         enemies.stream().peek(e -> e.update()).peek(e -> e.draw(gc)).forEach(en -> {
             if (player.hit(en) && !player.exploding) {
                 player.explode();
             }
         });
+        
+        shooterEnemies.stream().peek(e->e.update()).peek(e->e.draw(gc)).forEach(en->{
+            if (player.hit(en) && !player.exploding){
+                player.explode(); 
+            }
+        });
+        
+        //SHOOTER ENEMY BULLETS
+        for (ShooterEnemy shooterEnemy : shooterEnemies) {
+            Bullet shooterBullet = shooterEnemy.shoot();
+            if (shooterBullet != null) {
+                shooterBullets.add(shooterBullet);
+            }
+        }
+        
+        //HANDLE&DRAW ENEMY SHOOTER BULLETS
+        for (int i = shooterBullets.size() - 1; i >= 0; i--) {
+            Bullet bullet = shooterBullets.get(i);
+            if (bullet.posY < 0 || bullet.toRemove) {
+                shooterBullets.remove(i);
+                continue;
+            }
+            bullet.update();
+            bullet.draw(gc);
+            // Check collisions with the player only
+            if (bullet.hit(player) && !player.exploding) {
+                player.explode();
+                bullet.toRemove = true;
+            }
+        }
+        
+        //PLAYER BULLET MECHANICS
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
             if (bullet.posY < 0 || bullet.toRemove) {
@@ -127,6 +168,8 @@ public class App extends Application {
             }
             bullet.update();
             bullet.draw(gc);
+            
+            //checking collisions with enemies
             for (Enemy en : enemies) {
                 if (bullet.hit(en) && !en.exploding) {
                     score++;
@@ -134,14 +177,33 @@ public class App extends Application {
                     bullet.toRemove = true;
                 }
             }
-        }
-
-        for (int i = enemies.size() - 1; i >= 0; i--) {
-            if (enemies.get(i).destroyed) {
-                enemies.set(i, newEnemy());
+            
+            for(ShooterEnemy sEn: shooterEnemies){
+               if(bullet.hit(sEn) && !sEn.exploding){
+                   score++;
+                   sEn.explode();
+                   bullet.toRemove = true; 
+               } 
             }
         }
-
+        
+        
+        
+        //HOW ENEMY SPAWNING IS HANDLED
+        for (int i = enemies.size() - 1; i >= 0; i--) {
+            if (enemies.get(i).destroyed) { 
+                enemies.set(i, newEnemy());      
+            }
+        }
+        
+        for (int i = shooterEnemies.size() - 1; i >= 0; i--) {
+            if (shooterEnemies.get(i).destroyed) {
+                shooterEnemies.set(i, newShooterEnemy());
+            }
+        }
+        
+        
+        //HOW GAME OVER IS HANDLED
         gameOver = player.destroyed;
         if (RAND.nextInt(10) > 2) {
             univ.add(new Universe());
@@ -152,10 +214,19 @@ public class App extends Application {
                 univ.remove(i);
         }
     }
+    
+    
 
     Enemy newEnemy() {
-        return new Enemy(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE,
-                ENEMIES_IMG[RAND.nextInt(ENEMIES_IMG.length)]);
+        Enemy enemy = new Enemy(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, ENEMIES_IMG[1]);
+        enemy.dropsGold = RAND.nextInt(10) > 5;
+        return enemy;
+    }
+    
+    ShooterEnemy newShooterEnemy() {
+        ShooterEnemy sEnemy = new ShooterEnemy(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, ENEMIES_IMG[0]);
+        sEnemy.dropsGold = RAND.nextInt(10) > 5;
+        return sEnemy;
     }
 
        

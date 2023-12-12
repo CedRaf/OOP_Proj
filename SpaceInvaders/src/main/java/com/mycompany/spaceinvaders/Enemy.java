@@ -9,6 +9,8 @@ import javafx.scene.image.Image;
 
 public class Enemy extends Spaceship {
      double SPEED = (App.score / 8.0) + 2.0; 
+     boolean dropsGold; 
+     boolean isGoldDropped; 
 
     public Enemy(int posX, int posY, int size, Image image) {
         super(posX, posY, size, image);
@@ -22,6 +24,15 @@ public class Enemy extends Spaceship {
             posY += SPEED;
         if (posY > App.HEIGHT)
             destroyed = true;
+    }
+    
+    @Override
+    public void explode(){
+        if(dropsGold && !isGoldDropped){
+            App.gold += App.RAND.nextInt(5)+1;
+            isGoldDropped = true; 
+        }
+        super.explode(); 
     }
 }
 
