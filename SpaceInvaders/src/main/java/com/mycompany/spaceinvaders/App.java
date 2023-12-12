@@ -37,13 +37,17 @@ public class App extends Application {
     static final int EXPLOSION_H = 128;
     static final int EXPLOSION_STEPS = 15;
 
+    
     static final Image ENEMIES_IMG[] = {
         new Image("file:./images/shooter_enemy.png"),
         new Image("file:./images/regular_enemy.png")
     };
 
     
-    final int MAX_ENEMIES = 10, MAX_SHOTS = MAX_ENEMIES * 2;
+    int previousScore = 0;
+    boolean increasedEnemies = false;
+    int MAX_ENEMIES = 4;
+    final int MAX_SHOTS = MAX_ENEMIES * 2;
     boolean gameOver = false;
     private javafx.scene.canvas.GraphicsContext gc;
 
@@ -88,6 +92,7 @@ public class App extends Application {
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
         shooterEnemies = new ArrayList<>();
+        MAX_ENEMIES=4;
         player = new Spaceship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG, Color.YELLOW);
         score = 0;
         gold = 0;
@@ -106,6 +111,7 @@ public class App extends Application {
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + score, 60, 20);
         gc.fillText("Gold: " + gold, 60, 40); 
+        gc.fillText("Max Enemies" + MAX_ENEMIES, 60, 60);
               
         //GAME LOGIC     
         if (gameOver && score < 50) {
@@ -185,9 +191,26 @@ public class App extends Application {
                    sEn.explode();
                    bullet.toRemove = true; 
                } 
-            }
         }
-        
+            }
+
+        if (score > previousScore && score % 10 == 0 && !increasedEnemies) {
+           MAX_ENEMIES++;
+           increasedEnemies = true;
+           previousScore = score; 
+
+           // Adjust enemy count
+           while (enemies.size() < MAX_ENEMIES / 2) {
+               enemies.add(newEnemy());
+           }
+
+           while (shooterEnemies.size() < MAX_ENEMIES / 2) {
+               shooterEnemies.add(newShooterEnemy());
+           }
+       } else if (score % 10 != 0) {
+           increasedEnemies = false;
+       }
+
         
         
         //HOW ENEMY SPAWNING IS HANDLED
@@ -208,6 +231,8 @@ public class App extends Application {
         gameOver = player.destroyed;
         if (RAND.nextInt(10) > 2) {
             univ.add(new Universe());
+            
+           
         }
 
         for (int i = 0; i < univ.size(); i++) {
