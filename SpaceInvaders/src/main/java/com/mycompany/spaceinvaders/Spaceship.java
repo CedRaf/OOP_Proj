@@ -16,16 +16,26 @@ public class Spaceship {
     boolean exploding, destroyed;
     Image img;
     int explosionStep = 0;
-
+    private Color bulletColor;
+    
     public Spaceship(double posX, double posY, double size, Image img) {
         this.posX = posX;
         this.posY = posY;
         this.size = size;
+        this.img = img;  
+    }
+    
+
+    public Spaceship(double posX, double posY, double size, Image img, Color bulletColor) {
+        this.posX = posX;
+        this.posY = posY;
+        this.size = size;
         this.img = img;
+        this.bulletColor = bulletColor; 
     }
 
     public Bullet shoot() {
-        return new Bullet(posX + size / 2 - Bullet.size / 2, posY - Bullet.size);
+        return new Bullet(posX + size / 2 - Bullet.size / 2, posY - Bullet.size, true, false, bulletColor);
     }
 
     public void update() {

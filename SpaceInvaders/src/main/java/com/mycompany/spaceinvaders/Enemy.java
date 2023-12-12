@@ -8,7 +8,7 @@ package com.mycompany.spaceinvaders;
 import javafx.scene.image.Image;
 
 public class Enemy extends Spaceship {
-     double SPEED = (App.score / 8.0) + 2.0; 
+     double SPEED = (App.score / 10.0) + 2.0; 
      boolean dropsGold; 
      boolean isGoldDropped; 
 

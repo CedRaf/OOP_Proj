@@ -42,6 +42,7 @@ public class App extends Application {
         new Image("file:./images/regular_enemy.png")
     };
 
+    
     final int MAX_ENEMIES = 10, MAX_SHOTS = MAX_ENEMIES * 2;
     boolean gameOver = false;
     private javafx.scene.canvas.GraphicsContext gc;
@@ -87,8 +88,9 @@ public class App extends Application {
         bullets = new ArrayList<>();
         enemies = new ArrayList<>();
         shooterEnemies = new ArrayList<>();
-        player = new Spaceship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG);
+        player = new Spaceship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG, Color.YELLOW);
         score = 0;
+        gold = 0;
         IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newShooterEnemy()).forEach(shooterEnemies::add);
         IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newEnemy()).forEach(enemies::add);
         
@@ -96,6 +98,7 @@ public class App extends Application {
 
 
     private void run(javafx.scene.canvas.GraphicsContext gc) {
+        
         gc.setFill(Color.grayRgb(20));
         gc.fillRect(0, 0, WIDTH, HEIGHT);
         gc.setTextAlign(TextAlignment.CENTER);
@@ -103,8 +106,8 @@ public class App extends Application {
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + score, 60, 20);
         gc.fillText("Gold: " + gold, 60, 40); 
-
-        //GAME LOGIC
+              
+        //GAME LOGIC     
         if (gameOver && score < 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
@@ -114,13 +117,11 @@ public class App extends Application {
             gc.setFill(Color.YELLOW);
             gc.fillText("HAHAHA UR SHIT: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
         }
-        
-        
+       
         univ.forEach(u -> u.draw(gc)); 
         player.update();
         player.draw(gc);
         player.posX = (int) mouseX;
-        
         
         //ENEMY SPAWNING, SHOOTING, ETC.
         enemies.stream().peek(e -> e.update()).peek(e -> e.draw(gc)).forEach(en -> {
@@ -212,7 +213,8 @@ public class App extends Application {
         for (int i = 0; i < univ.size(); i++) {
             if (univ.get(i).posY > HEIGHT)
                 univ.remove(i);
-        }
+        }  
+        
     }
     
     
@@ -224,7 +226,7 @@ public class App extends Application {
     }
     
     ShooterEnemy newShooterEnemy() {
-        ShooterEnemy sEnemy = new ShooterEnemy(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, ENEMIES_IMG[0]);
+        ShooterEnemy sEnemy = new ShooterEnemy(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, ENEMIES_IMG[0], Color.YELLOW);
         sEnemy.dropsGold = RAND.nextInt(10) > 5;
         return sEnemy;
     }

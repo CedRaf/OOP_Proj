@@ -10,14 +10,17 @@ package com.mycompany.spaceinvaders;
  */
 
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 public class ShooterEnemy extends Enemy {
 
     private boolean canShoot = true;
     private long lastShotTime;
+    private Color bulletColor; 
 
-    public ShooterEnemy(int posX, int posY, int size, Image image) {
+    public ShooterEnemy(int posX, int posY, int size, Image image, Color bulletColor) {
         super(posX, posY, size, image);
+        this.bulletColor = bulletColor; 
     }
 
     @Override
@@ -34,7 +37,7 @@ public class ShooterEnemy extends Enemy {
     }
 
     private long getShootCooldown() {
-        return 2000; 
+        return 5000; 
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ShooterEnemy extends Enemy {
         if (canShoot) {
             lastShotTime = System.currentTimeMillis();
             canShoot = false;
-            return new Bullet(posX + size / 2 - Bullet.size / 2, posY + size);
+            return new Bullet(posX + size / 2 - Bullet.size / 2, posY + size, false, true, bulletColor);
         }
         return null; 
     }
