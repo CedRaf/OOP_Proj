@@ -111,7 +111,7 @@ public class App extends Application {
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + score, 60, 20);
         gc.fillText("Gold: " + gold, 60, 40); 
-        gc.fillText("Max Enemies" + MAX_ENEMIES, 60, 60);
+        gc.fillText("Max Enemies: " + MAX_ENEMIES, 80, 60);
               
         //GAME LOGIC     
         if (gameOver && score < 50) {
