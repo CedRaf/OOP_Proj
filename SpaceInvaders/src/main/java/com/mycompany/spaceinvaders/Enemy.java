@@ -35,4 +35,3 @@ public class Enemy extends Spaceship {
         super.explode(); 
     }
 }
-

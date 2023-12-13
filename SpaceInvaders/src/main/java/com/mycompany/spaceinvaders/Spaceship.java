@@ -11,7 +11,9 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class Spaceship {
 
-    
+    private boolean laserAbilityEnabled;
+    private int damageMultiplier;
+    private double speedMultiplier;
     double posX, posY, size;
     boolean exploding, destroyed;
     Image img;
@@ -68,4 +70,20 @@ public class Spaceship {
     private double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
+    
+     public void enableLaserAbility() {
+        laserAbilityEnabled = true;
+        // Implement the ability effect
+    }
+
+    public void increaseDamage() {
+        damageMultiplier++;
+        // Implement the ability effect
+    }
+
+    public void increaseSpeed() {
+        speedMultiplier += 0.5; // Adjust as needed
+        // Implement the ability effect
+    }
+    
 }

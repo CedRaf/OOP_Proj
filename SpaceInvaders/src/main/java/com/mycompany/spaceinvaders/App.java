@@ -19,6 +19,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceDialog;
 
 public class App extends Application {
 
@@ -50,7 +56,9 @@ public class App extends Application {
     final int MAX_SHOTS = MAX_ENEMIES * 2;
     boolean gameOver = false;
     private javafx.scene.canvas.GraphicsContext gc;
-
+    
+    private BossEnemy boss;
+    public static List<Bullet> bossBullets = new ArrayList<>();
     Spaceship player;
     List<Bullet> bullets;
     List<Bullet> shooterBullets;
@@ -83,6 +91,8 @@ public class App extends Application {
         stage.setScene(new Scene(new StackPane(canvas)));
         stage.setTitle("Spaceship Pew Pew");
         stage.show();
+        
+        
 
     }
 
@@ -100,6 +110,44 @@ public class App extends Application {
         IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newEnemy()).forEach(enemies::add);
         
 }
+    //SOMETHING TODO WITH BOSS
+     private void handleBullets(List<Bullet> bullets, List<? extends Spaceship> targets) {
+        for (int i = bullets.size() - 1; i >= 0; i--) {
+            Bullet bullet = bullets.get(i);
+            if (bullet.posY < 0 || bullet.toRemove) {
+                bullets.remove(i);
+                continue;
+            }
+            bullet.update();
+            bullet.draw(gc);
+
+            // Check collisions with enemies
+            for (Spaceship target : targets) {
+                if (bullet.hit(target) && !target.exploding) {
+                    if (target instanceof BossEnemy) {
+                        ((BossEnemy) target).takeDamage();
+                    } else {
+                        score++;
+                        target.explode();
+                    }
+                    bullet.toRemove = true;
+                }
+            }
+        }
+    }
+     //MAKE PLAYER SMOOTHER
+      private void updatePlayerPosition() {
+        player.posX = mouseX; // Adjust the interpolation factor as needed
+    }
+      
+      // Reset boss method
+private void resetBoss() {
+    boss = new BossEnemy(WIDTH / 2, 100, PLAYER_SIZE * 2, new Image("file:./images/boss.png"));
+    bossBullets.clear();// Clear boss bullets when resetting
+    boss=null;
+    // You can also reset any other boss-related variables or states here if needed
+}
+
 
 
     private void run(javafx.scene.canvas.GraphicsContext gc) {
@@ -113,16 +161,24 @@ public class App extends Application {
         gc.fillText("Gold: " + gold, 60, 40); 
         gc.fillText("Max Enemies: " + MAX_ENEMIES, 80, 60);
               
-        //GAME LOGIC     
+         //GAME LOGIC     
         if (gameOver && score < 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
             gc.fillText("Game Over! Your score is: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
+            
+            resetBoss();
+            // Remove the boss when the game is over
+        boss = null;
         } else if (gameOver && score > 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
             gc.fillText("HAHAHA UR SHIT: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
+    
+            // Remove the boss when the game is over
+            resetBoss();
         }
+        
        
         univ.forEach(u -> u.draw(gc)); 
         player.update();
@@ -191,8 +247,83 @@ public class App extends Application {
                    sEn.explode();
                    bullet.toRemove = true; 
                } 
-        }
+                 }
             }
+        
+        
+         //HANDLE BOSS LOGIC
+        if (score == 10 && boss == null) {
+            // Clear shooterBullets when the boss appears
+            //shooterBullets.clear();
+            boss = new BossEnemy(WIDTH / 2, 100, PLAYER_SIZE * 2, new Image("file:./images/boss.png"));
+        }
+        
+         // If the boss is present, handle boss logic
+        if (boss != null) {
+            boss.update();
+            boss.draw(gc);
+
+            // Boss movement
+            if (mouseX > boss.posX + boss.size / 2) {
+                boss.moveRight();
+            } else if (mouseX < boss.posX + boss.size / 2) {
+                boss.moveLeft();
+            }
+
+            // Boss shooting
+            Bullet bossBullet = boss.shoot();
+            if (bossBullet != null) {
+                bossBullets.add(bossBullet);
+            }
+            
+            
+
+            // Handle collisions with boss bullets and player
+            for (int i = bossBullets.size() - 1; i >= 0; i--) {
+                bossBullet = bossBullets.get(i);
+                if (bossBullet.posY > HEIGHT || bossBullet.toRemove) {
+                    bossBullets.remove(i);
+                    continue;
+                }
+                bossBullet.update();
+                bossBullet.draw(gc);
+                // Check collisions with the player only
+                if (bossBullet.hit(player) && !player.exploding) {
+                    player.explode();
+                    bossBullet.toRemove = true;
+                }
+            }
+
+            // Handle collisions with player bullets and boss
+            for (int i = bullets.size() - 1; i >= 0; i--) {
+                Bullet bullet = bullets.get(i);
+                if (bullet.posY < 0 || bullet.toRemove) {
+                    bullets.remove(i);
+                    continue;
+                }
+                bullet.update();
+                bullet.draw(gc);
+                // Check collisions with the boss only
+                if (boss.hit(bullet) && !boss.exploding) {
+                    boss.takeDamage();
+                    bullet.toRemove = true;
+                }
+            }
+
+            // Draw boss HP
+            gc.setFill(Color.RED);
+            gc.fillRect(WIDTH / 2 - 50, 10, boss.getHealth() * 10, 10);
+
+            // Check if the boss is defeated
+            if (boss.isDefeated()) {
+                boss = null; // Reset boss
+                score += 10; // Increment the score
+            }
+        }
+        
+        updatePlayerPosition();
+        handleBullets(bullets, enemies);
+        handleBullets(bullets, shooterEnemies);
 
         if (score > previousScore && score % 10 == 0 && !increasedEnemies) {
            MAX_ENEMIES++;
