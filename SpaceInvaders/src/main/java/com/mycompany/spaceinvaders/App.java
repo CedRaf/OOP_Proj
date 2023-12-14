@@ -109,9 +109,9 @@ public class App extends Application {
         IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newShooterEnemy()).forEach(shooterEnemies::add);
         IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newEnemy()).forEach(enemies::add);
         
-}
+    }
     //SOMETHING TODO WITH BOSS
-     private void handleBullets(List<Bullet> bullets, List<? extends Spaceship> targets) {
+    private void handleBullets(List<Bullet> bullets, List<? extends Spaceship> targets) {
         for (int i = bullets.size() - 1; i >= 0; i--) {
             Bullet bullet = bullets.get(i);
             if (bullet.posY < 0 || bullet.toRemove) {
@@ -135,18 +135,17 @@ public class App extends Application {
             }
         }
     }
-     //MAKE PLAYER SMOOTHER
-      private void updatePlayerPosition() {
+    //MAKE PLAYER SMOOTHER
+    private void updatePlayerPosition() {
         player.posX = mouseX; 
     }
       
       // Reset boss method
-private void resetBoss() {
-    boss = new BossEnemy(WIDTH / 2, 100, PLAYER_SIZE * 2, new Image("file:./images/boss.png"));
-    bossBullets.clear();
-    boss=null;
-    
-}
+    private void resetBoss() {
+        boss = new BossEnemy(WIDTH / 2, 100, PLAYER_SIZE * 2, new Image("file:./images/boss.png"));
+        bossBullets.clear();
+        boss = null; 
+    }
 
 
 
@@ -169,7 +168,7 @@ private void resetBoss() {
             
             resetBoss();
             // Remove the boss when the game is over
-        boss = null;
+            boss = null;
         } else if (gameOver && score > 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
@@ -251,15 +250,13 @@ private void resetBoss() {
             }
         
         
-         //HANDLE BOSS LOGIC
+        //HANDLE BOSS LOGIC
         if (score == 10 && boss == null) {
-            // Clear shooterBullets when the boss appears
-            //shooterBullets.clear();
             boss = new BossEnemy(WIDTH / 2, 100, PLAYER_SIZE * 2, new Image("file:./images/boss.png"));
         }
         
-         // If the boss is present, handle boss logic
-        if (boss != null) {
+        // If the boss is present, handle boss logic
+        if (boss != null && !boss.isDefeated()) {
             boss.update();
             boss.draw(gc);
 
@@ -269,15 +266,13 @@ private void resetBoss() {
             } else if (mouseX < boss.posX + boss.size / 2) {
                 boss.moveLeft();
             }
-
+            
             // Boss shooting
             Bullet bossBullet = boss.shoot();
-            if (bossBullet != null) {
+                if (bossBullet != null) {
                 bossBullets.add(bossBullet);
             }
-            
-            
-
+        
             // Handle collisions with boss bullets and player
             for (int i = bossBullets.size() - 1; i >= 0; i--) {
                 bossBullet = bossBullets.get(i);
@@ -294,7 +289,7 @@ private void resetBoss() {
                 }
             }
 
-            // Handle collisions with player bullets and boss
+           // Handle collisions with player bullets and boss
             for (int i = bullets.size() - 1; i >= 0; i--) {
                 Bullet bullet = bullets.get(i);
                 if (bullet.posY < 0 || bullet.toRemove) {
@@ -315,9 +310,8 @@ private void resetBoss() {
             gc.fillRect(WIDTH / 2 - 50, 10, boss.getHealth() * 10, 10);
 
             // Check if the boss is defeated
-            if (boss.isDefeated()) {
-                boss = null; // Reset boss
-                score += 10; // Increment the score
+            if (boss.isDefeated()) { 
+                resetBoss(); 
             }
         }
         

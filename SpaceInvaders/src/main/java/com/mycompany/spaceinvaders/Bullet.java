@@ -11,7 +11,7 @@ public class Bullet {
 
     public boolean toRemove;
     private final boolean isPlayerBullet;
-    private final boolean isShooterEnemyBullet; // New property
+    private final boolean isShooterEnemyBullet;
     private final Color bulletColor;
     double posX, posY, speed = 10;
     static final int size = 6;

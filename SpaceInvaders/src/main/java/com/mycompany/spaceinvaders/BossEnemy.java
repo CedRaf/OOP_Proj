@@ -39,7 +39,7 @@ public class BossEnemy extends Spaceship {
     public void takeDamage() {
         health--;
         if (health <= 0) {
-            explode();
+            explode(); 
         }
     }
 
@@ -65,6 +65,11 @@ public class BossEnemy extends Spaceship {
     
     @Override
    public Bullet shoot() {
+       
+        if(destroyed){
+           return null; 
+        }
+       
         if (shootingCooldown > 0) {
             shootingCooldown--;
             return null; // Boss is in cooldown, don't shoot
@@ -130,6 +135,7 @@ public class BossEnemy extends Spaceship {
  @Override
     public void update() {
         if (!exploding) {
+            shootingCooldown = Math.max(0, shootingCooldown - 1); // Decrease shootingCooldown
            // performDash();
             super.update();
         }
