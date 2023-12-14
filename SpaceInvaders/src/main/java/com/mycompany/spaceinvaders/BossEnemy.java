@@ -66,7 +66,7 @@ public class BossEnemy extends Spaceship {
     @Override
    public Bullet shoot() {
        
-        if(destroyed){
+          if(destroyed || health == 0){
            return null; 
         }
        
