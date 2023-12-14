@@ -137,15 +137,15 @@ public class App extends Application {
     }
      //MAKE PLAYER SMOOTHER
       private void updatePlayerPosition() {
-        player.posX = mouseX; // Adjust the interpolation factor as needed
+        player.posX = mouseX; 
     }
       
       // Reset boss method
 private void resetBoss() {
     boss = new BossEnemy(WIDTH / 2, 100, PLAYER_SIZE * 2, new Image("file:./images/boss.png"));
-    bossBullets.clear();// Clear boss bullets when resetting
+    bossBullets.clear();
     boss=null;
-    // You can also reset any other boss-related variables or states here if needed
+    
 }
 
 
