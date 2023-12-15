@@ -53,10 +53,13 @@ public class App extends Application {
     int previousScore = 0;
     boolean increasedEnemies = false;
     int MAX_ENEMIES = 4;
+    int durability = 0;
+    boolean gameStarted = false;
+    
     final int MAX_SHOTS = MAX_ENEMIES * 2;
     boolean gameOver = false;
     private javafx.scene.canvas.GraphicsContext gc;
-    
+    public Timeline runTimeline;
     private BossEnemy boss;
     public static List<Bullet> bossBullets = new ArrayList<>();
     Spaceship player;
@@ -74,28 +77,39 @@ public class App extends Application {
     public void start(Stage stage) throws Exception {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         gc = canvas.getGraphicsContext2D();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(30), e -> run(gc)));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
         canvas.setCursor(Cursor.MOVE);
         canvas.setOnMouseMoved(e -> mouseX = e.getX());
+
+        Timeline startTimeline = new Timeline(new KeyFrame(Duration.millis(30), e -> startRun(gc)));
+        startTimeline.setCycleCount(Timeline.INDEFINITE);
+        startTimeline.play();
+
         canvas.setOnMouseClicked(e -> {
-            if (bullets.size() < MAX_SHOTS)
-                bullets.add(player.shoot());
-            if (gameOver) {
-                gameOver = false;
-                setup();
+            if (!gameStarted) {
+                startTimeline.stop();
+                gameStarted = true;
+                runLoop(gc);
+            } else {
+                if (bullets.size() < MAX_SHOTS)
+                    bullets.add(player.shoot());
+                if (gameOver) {
+                    gameOver = false;
+                    gameStarted = false;
+                    setup();
+                    runTimeline.stop();
+                    startTimeline.play(); // Restart the start timeline
+                }
             }
         });
+
         setup();
         stage.setScene(new Scene(new StackPane(canvas)));
         stage.setTitle("Spaceship Pew Pew");
         stage.show();
-        
-        
-
     }
 
+    
+    
     public void setup() {
         univ = new ArrayList<>();
         shooterBullets = new ArrayList<>(); 
@@ -147,8 +161,53 @@ public class App extends Application {
         boss = null; 
     }
 
+    
+    private void startRun(javafx.scene.canvas.GraphicsContext gc){
+        gc.setFill(Color.grayRgb(20));
+        gc.fillRect(0, 0, WIDTH, HEIGHT);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFont(Font.font(45));
+        gc.setFill(Color.YELLOW);
+        gc.fillText("Start Game ", WIDTH/2, HEIGHT/2);
+        gc.setFont(Font.font(25));
+        gc.fillText("Increase Durability " + durability, (WIDTH/2)-200, HEIGHT-100); 
+        gc.fillText("Increase Bullet Speed ", (WIDTH/2)+200, HEIGHT-100);
+        
+//        canvas.setOnMouseClicked(e -> {
+//        double clickX = e.getX();
+//        double clickY = e.getY();
+//
+//        // Check if the click coordinates are within the "Increase Durability" area
+//        if (clickX > (WIDTH / 2) - 200 && clickX < (WIDTH / 2) && clickY > HEIGHT - 100) {
+//            player.increaseDurability(); // Call the spaceship method to increase durability
+//        }
+//
+//        // Check if the click coordinates are within the "Increase Bullet Speed" area
+//        if (clickX > (WIDTH / 2) + 200 && clickX < (WIDTH / 2) + 400 && clickY > HEIGHT - 100) {
+//            player.increaseBulletSpeed(); // Call the spaceship method to increase bullet speed
+//        }
+//    });
+        //Stars handling
+        univ.forEach(u -> u.draw(gc));
+        if (RAND.nextInt(10) > 2) {
+            univ.add(new Universe());
+            
+           
+        }
+        for (int i = 0; i < univ.size(); i++) {
+            if (univ.get(i).posY > HEIGHT)
+                univ.remove(i);
+        }  
+        
+    }
 
+    public void runLoop(javafx.scene.canvas.GraphicsContext gc){
+        runTimeline = new Timeline(new KeyFrame(Duration.millis(30), e -> run(gc)));
+        runTimeline.setCycleCount(Timeline.INDEFINITE);
+        runTimeline.play();
 
+    }
+    
     private void run(javafx.scene.canvas.GraphicsContext gc) {
         
         gc.setFill(Color.grayRgb(20));
