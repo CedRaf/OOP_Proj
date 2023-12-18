@@ -218,8 +218,8 @@ public class App extends Application {
         gc.fillText("Score: " + score, 60, 20);
         gc.fillText("Gold: " + gold, 60, 40); 
         gc.fillText("Max Enemies: " + MAX_ENEMIES, 80, 60);
-              
-         //GAME LOGIC     
+        
+        //GAME LOGIC     
         if (gameOver && score < 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
@@ -231,8 +231,8 @@ public class App extends Application {
         } else if (gameOver && score > 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
-            gc.fillText("HAHAHA UR SHIT: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
-    
+            gc.fillText("Good Job! Your score is: " + score + "\n Click to play again", WIDTH / 2, HEIGHT / 2.5);
+            
             // Remove the boss when the game is over
             resetBoss();
         }
@@ -307,10 +307,10 @@ public class App extends Application {
                } 
                  }
             }
-        
-        
+               
         //HANDLE BOSS LOGIC
-        if (score == 10 && boss == null) {
+        
+        if (score == 30 && boss == null) {
             boss = new BossEnemy(WIDTH / 2, 100, PLAYER_SIZE * 2, new Image("file:./images/boss.png"));
         }
         
@@ -372,6 +372,8 @@ public class App extends Application {
             if (boss.isDefeated()) { 
                 resetBoss(); 
             }
+        }else if(score < 10 || gameOver){
+            resetBoss(); 
         }
         
         updatePlayerPosition();
@@ -414,9 +416,7 @@ public class App extends Application {
         //HOW GAME OVER IS HANDLED
         gameOver = player.destroyed;
         if (RAND.nextInt(10) > 2) {
-            univ.add(new Universe());
-            
-           
+            univ.add(new Universe());   
         }
 
         for (int i = 0; i < univ.size(); i++) {
@@ -426,8 +426,6 @@ public class App extends Application {
         
     }
     
-    
-
     Enemy newEnemy() {
         Enemy enemy = new Enemy(50 + RAND.nextInt(WIDTH - 100), 0, PLAYER_SIZE, ENEMIES_IMG[1]);
         enemy.dropsGold = RAND.nextInt(10) > 5;

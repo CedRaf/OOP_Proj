@@ -27,7 +27,7 @@ public class BossEnemy extends Spaceship {
     
     public BossEnemy(int posX, int posY, int size, Image image) {
     super(posX, posY, size, image);
-    health = 10; // Initial health
+    health = 25; 
     shootingCooldown = 0;
     originalPosX = posX;
 }
