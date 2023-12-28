@@ -13,7 +13,7 @@ public class Bullet {
     private final boolean isPlayerBullet;
     private final boolean isShooterEnemyBullet;
     private final Color bulletColor;
-    double posX, posY, speed = 10;
+    double posX, posY, speed = 5;
     static final int size = 6;
 
     public Bullet(double posX, double posY, boolean isPlayerBullet, boolean isShooterEnemyBullet, Color bulletColor) {
@@ -24,6 +24,13 @@ public class Bullet {
         this.bulletColor = bulletColor;
     }
 
+    public void updatePlayerBullet(double speedMultiplier) {
+        if (isPlayerBullet) {
+            posY -= (speed+speedMultiplier);
+        } else {
+            posY += (speed+speedMultiplier);
+        }
+    }
     public void update() {
         if (isPlayerBullet) {
             posY -= speed;

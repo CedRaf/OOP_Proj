@@ -13,7 +13,8 @@ public class Spaceship {
 
     private boolean laserAbilityEnabled;
     private int damageMultiplier;
-    private double speedMultiplier;
+    public double speedMultiplier;
+    public int durability;
     double posX, posY, size;
     boolean exploding, destroyed;
     Image img;
@@ -28,12 +29,14 @@ public class Spaceship {
     }
     
 
-    public Spaceship(double posX, double posY, double size, Image img, Color bulletColor) {
+    public Spaceship(double posX, double posY, double size, Image img, Color bulletColor, int durability, int speedMultiplier) {
         this.posX = posX;
         this.posY = posY;
         this.size = size;
         this.img = img;
         this.bulletColor = bulletColor; 
+        this.durability = durability;
+        this.speedMultiplier =  speedMultiplier;
     }
 
     public Bullet shoot() {
@@ -85,5 +88,17 @@ public class Spaceship {
         speedMultiplier += 0.5; // Adjust as needed
         // Implement the ability effect
     }
-    
+    public void increaseDurability() {
+        durability++; // Adjust as needed
+        // Implement the ability effect
+    }
+    public void decreaseSpeed() {
+        speedMultiplier -= 0.5; // Adjust as needed
+        // Implement the ability effect
+    }
+    public void decreaseDurability() {
+        durability--; // Adjust as needed
+        // Implement the ability effect
+    }
+
 }
