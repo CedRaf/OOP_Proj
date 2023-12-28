@@ -43,7 +43,7 @@ public class App extends Application {
     static final int EXPLOSION_H = 128;
     static final int EXPLOSION_STEPS = 15;
 
-    
+    final int buttonHeight = 100;
     static final Image ENEMIES_IMG[] = {
         new Image("file:./images/shooter_enemy.png"),
         new Image("file:./images/regular_enemy.png")
@@ -53,9 +53,10 @@ public class App extends Application {
     int previousScore = 0;
     boolean increasedEnemies = false;
     int MAX_ENEMIES = 4;
-    int durability = 0;
+    int trueDurability=0;
+    int trueSpeed=0;
     boolean gameStarted = false;
-    
+   
     final int MAX_SHOTS = MAX_ENEMIES * 2;
     boolean gameOver = false;
     private javafx.scene.canvas.GraphicsContext gc;
@@ -71,7 +72,7 @@ public class App extends Application {
 
     private double mouseX;
     static int score;
-    static int gold; 
+    static int gold=0; 
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -80,16 +81,35 @@ public class App extends Application {
         canvas.setCursor(Cursor.MOVE);
         canvas.setOnMouseMoved(e -> mouseX = e.getX());
 
-        Timeline startTimeline = new Timeline(new KeyFrame(Duration.millis(30), e -> startRun(gc)));
+        Timeline startTimeline = new Timeline(new KeyFrame(Duration.millis(30), e -> startRun(gc, canvas)));
         startTimeline.setCycleCount(Timeline.INDEFINITE);
         startTimeline.play();
 
+        
+     
+
+
+        // Check if the click coordinates are within the "Increase Durability" area
+
         canvas.setOnMouseClicked(e -> {
-            if (!gameStarted) {
+            double clickX = e.getX();
+            double clickY = e.getY();
+            if (!gameStarted && clickY < HEIGHT - 150) {
                 startTimeline.stop();
                 gameStarted = true;
                 runLoop(gc);
-            } else {
+            }
+                if (clickX > (WIDTH / 2) - 200 && clickX < (WIDTH / 2) && clickY > HEIGHT - 150 && clickY < HEIGHT - 50 && gold >= 20 && !gameStarted) {
+                    trueDurability++; // Call the spaceship method to increase durability
+                    gold-=20;
+                }
+
+                // Check if the click coordinates are within the "Increase Bullet Speed" area
+                if (clickX > (WIDTH / 2) + 200 && clickX < (WIDTH / 2) + 400 && clickY > HEIGHT - 150 && clickY < HEIGHT -50 && gold >= 20 && !gameStarted) {
+                    trueSpeed++; // Call the spaceship method to increase bullet speed
+                    gold-=20;
+                }
+             else {
                 if (bullets.size() < MAX_SHOTS)
                     bullets.add(player.shoot());
                 if (gameOver) {
@@ -99,6 +119,7 @@ public class App extends Application {
                     runTimeline.stop();
                     startTimeline.play(); // Restart the start timeline
                 }
+
             }
         });
 
@@ -117,12 +138,14 @@ public class App extends Application {
         enemies = new ArrayList<>();
         shooterEnemies = new ArrayList<>();
         MAX_ENEMIES=4;
-        player = new Spaceship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG, Color.YELLOW);
+        player = new Spaceship(WIDTH / 2, HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_IMG, Color.YELLOW,trueDurability, trueSpeed);
+        
         score = 0;
-        gold = 0;
+        
         IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newShooterEnemy()).forEach(shooterEnemies::add);
         IntStream.range(0, MAX_ENEMIES / 2).mapToObj(i -> newEnemy()).forEach(enemies::add);
-        
+        player.durability=trueDurability;
+        player.speedMultiplier=trueSpeed;
     }
     //SOMETHING TODO WITH BOSS
     private void handleBullets(List<Bullet> bullets, List<? extends Spaceship> targets) {
@@ -162,7 +185,7 @@ public class App extends Application {
     }
 
     
-    private void startRun(javafx.scene.canvas.GraphicsContext gc){
+    private void startRun(javafx.scene.canvas.GraphicsContext gc, Canvas canvas){
         gc.setFill(Color.grayRgb(20));
         gc.fillRect(0, 0, WIDTH, HEIGHT);
         gc.setTextAlign(TextAlignment.CENTER);
@@ -170,23 +193,16 @@ public class App extends Application {
         gc.setFill(Color.YELLOW);
         gc.fillText("Start Game ", WIDTH/2, HEIGHT/2);
         gc.setFont(Font.font(25));
-        gc.fillText("Increase Durability " + durability, (WIDTH/2)-200, HEIGHT-100); 
-        gc.fillText("Increase Bullet Speed ", (WIDTH/2)+200, HEIGHT-100);
+        gc.fillText("Increase Durability cost: 20,  " + trueDurability, (WIDTH/2)-200, HEIGHT-100); 
+        gc.fillText("Increase Bullet Speed cost: 20,  " + trueSpeed, (WIDTH/2)+200, HEIGHT-100);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setFont(Font.font(20));
+        gc.setFill(Color.WHITE);
+        gc.fillText("Gold: " + gold, 60, 20);
         
-//        canvas.setOnMouseClicked(e -> {
-//        double clickX = e.getX();
-//        double clickY = e.getY();
-//
-//        // Check if the click coordinates are within the "Increase Durability" area
-//        if (clickX > (WIDTH / 2) - 200 && clickX < (WIDTH / 2) && clickY > HEIGHT - 100) {
-//            player.increaseDurability(); // Call the spaceship method to increase durability
-//        }
-//
-//        // Check if the click coordinates are within the "Increase Bullet Speed" area
-//        if (clickX > (WIDTH / 2) + 200 && clickX < (WIDTH / 2) + 400 && clickY > HEIGHT - 100) {
-//            player.increaseBulletSpeed(); // Call the spaceship method to increase bullet speed
-//        }
-//    });
+        
+
+ 
         //Stars handling
         univ.forEach(u -> u.draw(gc));
         if (RAND.nextInt(10) > 2) {
@@ -218,8 +234,14 @@ public class App extends Application {
         gc.fillText("Score: " + score, 60, 20);
         gc.fillText("Gold: " + gold, 60, 40); 
         gc.fillText("Max Enemies: " + MAX_ENEMIES, 80, 60);
+        gc.fillText("Durability: " + player.durability, 80, 80);
+              
+         //GAME LOGIC     
+
         
         //GAME LOGIC     
+
+
         if (gameOver && score < 50) {
             gc.setFont(Font.font(35));
             gc.setFill(Color.YELLOW);
@@ -245,14 +267,24 @@ public class App extends Application {
         
         //ENEMY SPAWNING, SHOOTING, ETC.
         enemies.stream().peek(e -> e.update()).peek(e -> e.draw(gc)).forEach(en -> {
-            if (player.hit(en) && !player.exploding) {
+            if (player.hit(en) && !player.exploding && player.durability == 0) {
                 player.explode();
+            }
+            else{
+                if (player.hit(en) && !player.exploding && player.durability !=0) {
+                player.decreaseDurability();
+                }
             }
         });
         
         shooterEnemies.stream().peek(e->e.update()).peek(e->e.draw(gc)).forEach(en->{
-            if (player.hit(en) && !player.exploding){
-                player.explode(); 
+            if (player.hit(en) && !player.exploding && player.durability ==0) {
+                player.explode();
+            }
+            else{
+                if (player.hit(en) && !player.exploding && player.durability !=0) {
+                player.decreaseDurability();
+                }
             }
         });
         
@@ -274,9 +306,15 @@ public class App extends Application {
             bullet.update();
             bullet.draw(gc);
             // Check collisions with the player only
-            if (bullet.hit(player) && !player.exploding) {
+            if (bullet.hit(player) && !player.exploding && player.durability != 0 ) {
+                player.decreaseDurability();
+                bullet.toRemove = true;
+            }
+            else{
+                if (bullet.hit(player) && !player.exploding && player.durability == 0 ) {
                 player.explode();
                 bullet.toRemove = true;
+            }
             }
         }
         
@@ -287,7 +325,7 @@ public class App extends Application {
                 bullets.remove(i);
                 continue;
             }
-            bullet.update();
+            bullet.updatePlayerBullet(player.speedMultiplier);
             bullet.draw(gc);
             
             //checking collisions with enemies
